@@ -1,4 +1,9 @@
-# DQN — Entrenamiento de Agente en ALE/Pong-v5 🏓
+# DQN — Entrenamiento de Agente en ALE/Pong-v5 
+
+> **Institución:** Universidad de La Sabana  
+> **Asignatura:** Simulación y Aprendizaje por Refuerzo  
+> **Modalidad:** Grupal (Álvaro Jiménez, Claudia Soto, Juan Tovar, Oscar Mantilla, Pedro Martínez, Oscar Torres)  
+> **Ambiente:** `ALE/Pong-v5` (Gymnasium — Atari Pong)
 
 Este repositorio contiene la implementación y los resultados del entrenamiento de un agente de Reinforcement Learning utilizando **Deep Q-Network (DQN)** para jugar Atari Pong (`ALE/Pong-v5`).
 
@@ -73,7 +78,9 @@ El agente fue entrenado en GPU (NVIDIA T4 x2 a través de Kaggle) durante **10.7
 | Recompensa Media (Evaluación Greedy) | **+9.10** |
 | Desviación Std (Evaluación) | 8.31 |
 
-*(Se anexa en el repositorio el gráfico `learning_curve.png` con la evolución de la recompensa y la pérdida).*
+*(Se anexa en el repositorio el gráfico `learning_curve.png` con la evolución de la recompensa y la pérdida):*
+
+![Curva de Aprendizaje](learning_curve.png)
 
 ---
 
@@ -96,9 +103,101 @@ El mayor reto de esta práctica fue la **gestión de memoria RAM y la infraestru
 
 ---
 
-### Archivos en este repositorio
-- `DQN_PONG_V2.py`: Script principal de entrenamiento y arquitectura.
-- `ver_agente_jugar.py`: Script de inferencia para evaluar y visualizar visualmente al agente entrenado.
-- `dqn_pong_best.pth`: Pesos de la mejor red neuronal obtenida (PyTorch).
-- `dqn_pong_checkpoint.pth`: Punto de guardado del último estado del entrenamiento.
-- `learning_curve.png`: Gráfica del rendimiento.
+## 7. Estructura del Repositorio
+
+```text
+├── DQN_PONG_V2.py               # Script principal con entrenamiento, buffer y arquitectura DQN
+├── ver_agente_jugar.py          # Script de inferencia y visualización gráfica en tiempo real
+├── dqn_pong_best.pth            # Pesos de la mejor red neuronal obtenida (PyTorch)
+├── dqn_pong_checkpoint.pth      # Punto de guardado del último episodio entrenado
+├── learning_curve.png           # Gráfica de evolución de recompensa y función de pérdida
+├── modelos_dqn.zip              # Archivo comprimido con los checkpoints de los modelos
+├── dqn_pong_best.zip            # Respaldo comprimido del mejor modelo
+├── dqn_pong_checkpoint.zip      # Respaldo comprimido del último checkpoint
+└── README.md                    # Documentación detallada del proyecto
+```
+
+---
+
+## 8. Guía de Ejecución e Inferencia (`ver_agente_jugar.py`)
+
+El script `ver_agente_jugar.py` permite cargar los pesos del modelo entrenado y abrir una ventana gráfica interactiva para observar al agente jugando Pong en tiempo real contra la máquina.
+
+### Requisitos previos
+Instala las dependencias necesarias en tu entorno de Python:
+```bash
+pip install torch gymnasium[atari] ale-py opencv-python numpy
+```
+
+> **Nota:** Asegúrate de que el archivo de pesos `dqn_pong_best.pth` esté en el mismo directorio que `ver_agente_jugar.py` (o especifica su ruta con `--modelo`).
+
+---
+
+### Modos de Uso
+
+#### 1. Ejecución rápida por defecto
+Ejecuta 3 episodios con el mejor modelo a 60 FPS (~16 ms de retardo entre frames):
+```bash
+python ver_agente_jugar.py
+```
+
+#### 2. Personalizar número de episodios
+Para evaluar al agente durante más partidas (por ejemplo, 5 episodios):
+```bash
+python ver_agente_jugar.py --episodios 5
+```
+
+#### 3. Ajustar la velocidad de reproducción
+Puedes regular los milisegundos de retardo entre frames con el argumento `--velocidad`:
+```bash
+# A 30 FPS (movimiento más pausado para apreciar las jugadas)
+python ver_agente_jugar.py --velocidad 33
+
+# A máxima velocidad (sin retardo artificial)
+python ver_agente_jugar.py --velocidad 0
+```
+
+#### 4. Probar un checkpoint específico
+Si deseas evaluar el último checkpoint guardado en lugar del mejor:
+```bash
+python ver_agente_jugar.py --modelo dqn_pong_checkpoint.pth --episodios 3
+```
+
+---
+
+### Parámetros Disponibles
+
+| Argumento | Tipo | Por defecto | Descripción |
+|---|:---:|:---:|---|
+| `--modelo` | `str` | `dqn_pong_best.pth` | Ruta al archivo `.pth` con los pesos de la red. |
+| `--episodios` | `int` | `3` | Número de episodios completos a ejecutar. |
+| `--velocidad` | `int` | `16` | Milisegundos de pausa entre frames (`16` ≈ 60 FPS, `0` = máx velocidad). |
+
+---
+
+### Salida esperada en consola
+Al ejecutarse, se abrirá la ventana gráfica del juego y en la terminal se mostrará el reporte en vivo junto al resumen estadístico final:
+
+```text
+=======================================================
+  DQN Pong — Agente entrenado jugando
+  Modelo    : dqn_pong_best.pth
+  Dispositivo: cuda
+=======================================================
+
+[INFO] Cargando modelo...
+  Episodio guardado  : 1950
+  Mejor recompensa   : 21.0
+[INFO] Modelo cargado. Abriendo ventana de juego...
+
+[Episodio 1/3] Jugando...
+  Recompensa = +21  🏆 GANA  |  Pasos: 1,842
+
+=======================================================
+  RESUMEN — 3 episodios
+  Media   : +14.3
+  Máximo  : +21
+  Mínimo  : +7
+=======================================================
+```
+
